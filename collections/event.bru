@@ -1,0 +1,22 @@
+meta {
+  name: Post a webhook
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/event/bitbucket
+}
+
+body {
+  actor: "migueltinembart@gmail.com"
+  respository: "wsl"
+  push: [
+    {
+      new: {
+        type: "branch",
+        name: "main"
+        }
+    }
+  ]
+}

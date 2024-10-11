@@ -1,2 +1,6 @@
-if __name__ == "__main__":
-    print("Hello World")
+from fastapi import FastAPI
+from routes import event
+from providers.vsphere.repository import VSphereRepository
+
+repo = VSphereRepository()
+repo.updateVM()

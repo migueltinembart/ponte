@@ -1,21 +1,10 @@
-from enum import Enum
 from typing import List
 from pydantic import BaseModel
+from providers.base import ByteUnit
 
-class ByteUnit(Enum):
-    MB = 1
-    GB = 2
-    TB = 3
-
-class NetworkConfig(BaseModel):
-    pass
-
-class VSphereNetworkConfig(NetworkConfig):
+class VSphereNetworkConfig(BaseModel):
     adapterType: str
     vlan_name: str
-
-class ProviderConfig(BaseModel):
-    pass
 
 class Disk(BaseModel):
     size: int
@@ -26,13 +15,13 @@ class VSphereGuestConfig(BaseModel):
     metadata: str
     vendordata: str
 
-class vSphereProviderConfig(ProviderConfig):
+class vSphereProviderConfig(BaseModel):
     cpu_cores: int
     memory: int
     disk: List[Disk]
-    network: List[NetworkConfig]
+    network: List[VSphereNetworkConfig]
     guestconfig: VSphereGuestConfig
 
-class Machine(BaseModel):
+class VSphereMachine(BaseModel):
     hostname: str
-    providerConfig: ProviderConfig
+    providerConfig: vSphereProviderConfig
