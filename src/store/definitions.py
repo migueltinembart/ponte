@@ -1,26 +1,28 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any
 
-class Repository(ABC):
+from pydantic import BaseModel
+
+class Repository(BaseModel):
 
     @abstractmethod
     def list(self) -> Any:
         pass
     
-    # @abstractmethod
-    # def get(self, id):
+    # @abstractmethod 
+    # def get(self, id) -> Any:
     #     pass
     #
     # @abstractmethod
-    # def create(self, entity):
+    # def create(self, entity) -> Any:
     #     pass
     #
     # @abstractmethod
-    # def update(self, id, entity):
+    # def update(self, id, entity) -> Any:
     #     pass
     #
     # @abstractmethod
-    # def delete(self, id):
+    # def delete(self, id) -> Any:
     #     pass
     #
 
