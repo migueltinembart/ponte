@@ -6,7 +6,6 @@ from typing import List
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 sys.path.append(src_path)
 
-from _pytest.monkeypatch import resolve
 import pytest
 import logging
 from testcontainers import redis
