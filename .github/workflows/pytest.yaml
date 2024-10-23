@@ -1,7 +1,6 @@
 name: Unit Tests
 on: 
-    pull_request: 
-        branches-ignore: main
+  pull-request
 
 jobs:
     build:
