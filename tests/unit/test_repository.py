@@ -30,7 +30,7 @@ def setup():
     books.append(book_two)
 
     for book in books:
-        count = rc.incr("book_id")
+        count = rc.incr("bookcounter")
         rc.hset("book:{}".format(str(count)), mapping=dict(book))
 
 
@@ -59,10 +59,12 @@ def test_if_keys_are_there():
     
     keys = rc.keys(f"book:*")
     
-    id = rc.get("book_id")
+    id = rc.get("bookcounter")
+
     assert len(entries) == 2
     assert len(keys) == 2
     assert id == "2"
+
 def test_if_list_is_initialized_with_books():
     rc = redisContainer.get_client(decode_responses=True)
     
@@ -92,7 +94,7 @@ def test_repository_creating_Book():
     bookRepo.create(book) 
 
     result = bookRepo.list()
-
+    print(result)
     assert len(result) == 3
     assert isinstance(result[2], Book)
 
@@ -101,27 +103,39 @@ def test_removing_key():
     bookRepo = RedisRepository[Book](rc=rc, key="book")
     result = bookRepo.delete(2)
     result2 = bookRepo.delete(2)  
-    list = bookRepo.list()
+    listresult = bookRepo.list()
 
     assert result == True
     assert result2 == False
-    assert len(list) == 2
+    assert len(listresult) == 2
 
 def test_if_deleted_keys_will_not_be_reassigned():
     previosly_deleted_id = 2
     rc = redisContainer.get_client(decode_responses=True)
     bookRepo = RedisRepository[Book](rc=rc, key="book")
     book = Book(name="Schneewitchen", pages=100, author="Irgendjemand")
-
-    res = bookRepo.list() 
-    print(res)
+    
     bookRepo.create(book)
-    res = bookRepo.list()
-    print(res)
+
     not_exist = bookRepo.get(previosly_deleted_id)
     exist = bookRepo.get(4)
 
-
     assert not_exist == None
-    assert exist == Book
+    assert isinstance(exist, Book)
 
+def test_repository_updates_correct_record():
+    rc = redisContainer.get_client(decode_responses=True)
+    bookRepo = RedisRepository[Book](rc=rc, key="book")
+
+    to_change = 3 
+    
+    old = bookRepo.get(to_change)
+
+    new = Book(name=old.name, author=old.author, pages=10000)
+
+    result = bookRepo.update(to_change, new)
+    
+    new = bookRepo.get(to_change)
+    assert old != new
+    assert new.pages == 10000
+    assert result == True
