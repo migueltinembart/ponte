@@ -1,5 +1,6 @@
 import sys
 import os
+from time import sleep
 from typing import List
 
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
@@ -49,35 +50,78 @@ def session(request: pytest.FixtureRequest):
 
     setup()
 
-
+def test_if_keys_are_there():
+    rc = redisContainer.get_client(decode_responses=True)
+    
+    entries = []
+    for i in range(2):
+        entries.append(rc.hgetall(f"book:{i}"))
+    
+    keys = rc.keys(f"book:*")
+    
+    id = rc.get("book_id")
+    assert len(entries) == 2
+    assert len(keys) == 2
+    assert id == "2"
 def test_if_list_is_initialized_with_books():
     rc = redisContainer.get_client(decode_responses=True)
-    bookRepo = RedisRepository[Book](rc=rc, key="book")
-    assert len(bookRepo.list()) == 2
+    
+    result = rc.hgetall("book:1")
+    book1 = Book.model_validate(result)
 
-def test_if_keys_are_correctly_defined():
+    assert isinstance(book1, Book)
+    assert book1.name == "Miguels Book"
+    assert book1.pages == 200
+    assert book1.author == "Miguel"
+
+def test_repository_returning_list_of_books():
     rc = redisContainer.get_client(decode_responses=True)
     bookRepo = RedisRepository[Book](rc=rc, key="book")
-    bookRepo.delete(1)
-    assert len(bookRepo.list()) == 1
 
-def test_if_hashmaps_can_be_created():
+    result = bookRepo.list()
+
+    assert len(result) == 2 
+    assert isinstance(result, List)
+    assert isinstance(result[1], Book)
+
+def test_repository_creating_Book():
     rc = redisContainer.get_client(decode_responses=True)
     bookRepo = RedisRepository[Book](rc=rc, key="book")
     
     book = Book(name="Harry Potter", pages=600, author="J.K. Rowling")
-    bookRepo.create(book)
-    
-    result = bookRepo.list()
-    print(result)
-    assert len(result) == 2
-    assert isinstance(result[1], Book)
+    bookRepo.create(book) 
 
-def test_if_getting_Book_is_actually_a_Book():
+    result = bookRepo.list()
+
+    assert len(result) == 3
+    assert isinstance(result[2], Book)
+
+def test_removing_key():
     rc = redisContainer.get_client(decode_responses=True)
     bookRepo = RedisRepository[Book](rc=rc, key="book")
-    
-    result = bookRepo.get(2)
-    
-    assert isinstance(result, Book)
+    result = bookRepo.delete(2)
+    result2 = bookRepo.delete(2)  
+    list = bookRepo.list()
+
+    assert result == True
+    assert result2 == False
+    assert len(list) == 2
+
+def test_if_deleted_keys_will_not_be_reassigned():
+    previosly_deleted_id = 2
+    rc = redisContainer.get_client(decode_responses=True)
+    bookRepo = RedisRepository[Book](rc=rc, key="book")
+    book = Book(name="Schneewitchen", pages=100, author="Irgendjemand")
+
+    res = bookRepo.list() 
+    print(res)
+    bookRepo.create(book)
+    res = bookRepo.list()
+    print(res)
+    not_exist = bookRepo.get(previosly_deleted_id)
+    exist = bookRepo.get(4)
+
+
+    assert not_exist == None
+    assert exist == Book
 
