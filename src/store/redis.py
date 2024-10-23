@@ -1,30 +1,29 @@
-from typing import List, TypeVar, get_args, Generic
+from typing import List,Union, get_args 
+from pluggy import Result
 from pydantic import BaseModel
 from redis import Redis
-from store.definitions import Repository
-from typing import Optional, Any
+from typing import  Any
 import json
-
-DataT = TypeVar("DataT")
-
 
 class Book(BaseModel):
     name: str
     pages: int
     author: str
 
-
-def redis_response_to_pydantic_model(
-    response: Any, model: BaseModel
-) -> Optional[BaseModel | List[BaseModel] | None]:
+def fromStr[T: BaseModel](response: Any, model: T) -> Union[T, None]:
     if response is None:
         return None
-    if isinstance(response, bytes):
-        response = response.decode("utf-8")
     if isinstance(response, str):
         data_dict = json.loads(response)
         return model.model_validate(**data_dict)
-    elif isinstance(response, dict):
+    else:
+        raise ValueError(f"Unexpected response type: {type(response)}")
+    
+
+def fromDict[T: BaseModel](response: Any, model: T) -> Union[T, None]:
+    if response is None:
+        return None
+    if isinstance(response, dict):
         # Convert keys and values from bytes to strings if necessary
         data_dict = {
             (k.decode("utf-8") if isinstance(k, bytes) else k): (
@@ -33,6 +32,29 @@ def redis_response_to_pydantic_model(
             for k, v in response.items()
         }
         return model.model_validate(data_dict)
+    else:
+        raise ValueError(f"Unexpected response type: {type(response)}")
+
+
+def redis_response_to_pydantic_model[T: BaseModel](
+    response: Any, model: T
+) -> Union[List[T] ,T , None]:
+    if response is None:
+        return None
+    if isinstance(response, bytes):
+        response = response.decode("utf-8")
+    if isinstance(response, str):
+        data_dict = json.loads(response)
+        return model.model_validate({**data_dict})
+    elif isinstance(response, dict):
+        # Convert keys and values from bytes to strings if necessary
+        data_dict = {
+            (k.decode("utf-8") if isinstance(k, bytes) else k): (
+                v.decode("utf-8") if isinstance(v, bytes) else v
+            )
+            for k, v in response.items()
+        }
+        return model.model_validate({**data_dict})
     elif isinstance(response, list):
         # Handle list of models
         item_list = []
@@ -42,17 +64,15 @@ def redis_response_to_pydantic_model(
     else:
         raise ValueError(f"Unexpected response type: {type(response)}")
 
-T = TypeVar('T', bound=BaseModel)
 
-class RedisRepository(Generic[T]):
+class RedisRepository[T: BaseModel]:
     """Defines A model, wich takes a redis client as dependency"""
 
     def __init__(self, rc: Redis, key: str) -> None:
-        super().__init__()
         self.__rc: Redis = rc
-        self.__key: str = key
+        self.__key = key
 
-    def list(self, options=None) :
+    def list(self, options=None) -> List[T] | None:
         if options:
             pass
 
@@ -68,57 +88,56 @@ class RedisRepository(Generic[T]):
             for key in key_list:
                 pipe.hgetall(key)
             result = pipe.execute()
-
-
-        data_model = get_args(self.__orig_class__)[0] # type: ignore
-        return redis_response_to_pydantic_model(result, data_model) # type: ignore
-
-    def get(self, id: int, options=None):
-        if options:
-            pass
-        full_key = ":".join((self.__key, str(id)))
-        with self.__rc as rc:
-            result = rc.hgetall(full_key)
+        
 
         data_model = get_args(self.__orig_class__)[0] # type: ignore
+
         return redis_response_to_pydantic_model(result, data_model)
+    
+    def get(self, id: int, options=None) -> T | None:
+        if options:
+            pass
+        full_key = f"{self.__key}:{id}"
+        with self.__rc as rc:
+            result = rc.hgetall(full_key) 
+        if not result:
+            return None
+        data_model = get_args(self.__orig_class__)[0] # type: ignore
 
-    def create(self, model: BaseModel, options=None):
+        return fromDict(result, data_model)
+
+    def create(self, model: BaseModel, options=None) -> bool:
         if options:
             pass
 
         with self.__rc as rc:
-            pipe = rc.pipeline()
-            current_id = f"{self.__key}_id"
+            print("key is", self.__key)
+            current_id = f"{self.__key}counter"
+            count = rc.incr(current_id)
+            
+            with rc.pipeline() as pipe:
 
-            count = pipe.incr(current_id)
-             
-            pipe.hset(f"{self.__key}:{count}", mapping=dict(model))
-
-            result = pipe.execute()
-
-        match result:
-            case 0:
-                return False
-            case 1:
+                pipe.hset(f"{self.__key}:{count}", mapping=dict(model))
+                result = pipe.execute()
+            print("pip result:", result)
+            print(model.model_fields.keys())
+            if result[0] == len(model.model_fields.keys()):
                 return True
 
-    def update(self, id: int, model: BaseModel, options=None):
+            return False
+
+    def update(self, id: int, model: BaseModel, options=None) -> bool:
         if options:
             pass
 
-
         with self.__rc as rc:
-            pipe = rc.pipeline()
-            pipe.hset(f"{self.__key}_{id}", mapping=dict(model))
+            result = rc.hset(f"{self.__key}:{id}", mapping=dict(model))
+        
+        if result == 0:
+            return True
+        return False
 
-            result = pipe.execute()
-
-        model_class = get_args(self.__orig_class__)[0] # type: ignore
-
-        return redis_response_to_pydantic_model(result[0], model_class)
-
-    def delete(self, id: int, options=None):
+    def delete(self, id: int, options=None) -> bool:
         if options:
             pass
 
@@ -126,8 +145,7 @@ class RedisRepository(Generic[T]):
         with self.__rc as rc:
             result = rc.delete(f"{self.__key}:{id}")
 
-        match result:
-            case 0:
-                return False
-            case 1:
+            if result == 1:
                 return True
+
+        return False

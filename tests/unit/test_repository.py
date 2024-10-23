@@ -19,6 +19,7 @@ redisContainer = redis.RedisContainer("redis:7.4.1")
 
 
 def setup():
+    '''sets up a simple dataset for tests'''
     rc = redisContainer.get_client(decode_responses=True)
 
     books: List[Book] = []
@@ -33,7 +34,8 @@ def setup():
         count = rc.incr("bookcounter")
         rc.hset("book:{}".format(str(count)), mapping=dict(book))
 
-
+# Fixture gets run before the tests to initialize redis container
+# autouse makes the fixture automatically attach to the test
 @pytest.fixture(scope="session", autouse=True)
 def session(request: pytest.FixtureRequest):
     logging.info("[fixture] starting redis container")
@@ -91,10 +93,10 @@ def test_repository_creating_Book():
     bookRepo = RedisRepository[Book](rc=rc, key="book")
     
     book = Book(name="Harry Potter", pages=600, author="J.K. Rowling")
-    bookRepo.create(book) 
+    created = bookRepo.create(book) 
 
     result = bookRepo.list()
-    print(result)
+    assert created == True
     assert len(result) == 3
     assert isinstance(result[2], Book)
 
@@ -130,12 +132,11 @@ def test_repository_updates_correct_record():
     to_change = 3 
     
     old = bookRepo.get(to_change)
-
-    new = Book(name=old.name, author=old.author, pages=10000)
-
-    result = bookRepo.update(to_change, new)
-    
+    book = Book(name=old.name, author=old.author, pages=10000)
+    result = bookRepo.update(to_change, book)
     new = bookRepo.get(to_change)
+
     assert old != new
     assert new.pages == 10000
     assert result == True
+
