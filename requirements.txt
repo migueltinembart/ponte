@@ -1,5 +1,6 @@
 pydantic
 pytest
+coverage
 fastapi
 redis
 testcontainers
