@@ -1,0 +1,7 @@
+pydantic
+pytest
+coverage
+fastapi
+redis
+testcontainers
+typing-inspect
