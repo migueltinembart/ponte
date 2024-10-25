@@ -5,3 +5,5 @@ fastapi
 redis
 testcontainers
 typing-inspect
+git+https://github.com/vmware/vsphere-automation-sdk-python.git@v8.0.3.0
+setuptools
