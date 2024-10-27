@@ -57,8 +57,8 @@ class VM(BaseModel):
     @field_validator("source")
     def check_Template_path(cls, v: TemplateSource, info: ValidationInfo) -> TemplateSource:
         if isinstance(v, TemplateSource):
-            pattern = '^(\\/)?(?:[a-zA-Z0-9._-]+\\/?)+$'
-            is_path = re.search(pattern, v.path)
+            pattern = r'^(/)?([^/\0]+(/[^/\0]+)*)?$'
+            is_path = re.match(pattern, v.path)
             assert is_path,  f"{info.field_name} must be a path"
         return v
 
