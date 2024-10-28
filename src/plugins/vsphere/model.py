@@ -1,18 +1,6 @@
 from typing import Literal, Optional, Union, List
 from uuid import UUID, uuid4
-import requests
-import urllib3
 from pydantic import Base64Str, BaseModel, Field
-from vmware.vapi.vsphere.client import create_vsphere_client
-
-def vSphereClientFactory(server: str, username: str, password: str):
-    session = requests.session()
-
-    session.verify = False
-
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-    return create_vsphere_client(server=server, username=username, password=password, session=session)
 
 class VsphereStorageConfig(BaseModel):
     type: Literal["thin", "thick"]
