@@ -1,9 +1,14 @@
 pydantic
+pydantic_settings
 pytest
 coverage
 fastapi
 redis
 testcontainers
 typing-inspect
-git+https://github.com/vmware/vsphere-automation-sdk-python.git@v8.0.3.0
 setuptools
+gidgethub
+azure-mgmt-resource
+azure-mgmt-compute
+azure-mgmt-network
+azure-identity

@@ -1,21 +1,26 @@
 import sys
 import os
-from time import sleep
 from typing import List
 
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 sys.path.append(src_path)
 
+from pydantic import BaseModel
 import pytest
 import logging
 from testcontainers import redis
 from testcontainers.core.container import wait_for_logs
-from store.redis import Book, RedisRepository
+from store.redis import RedisRepository
+
+# Test class
+class Book(BaseModel):
+    name: str
+    pages: int
+    author: str
 
 # Prefect
 
 redisContainer = redis.RedisContainer("redis:7.4.1")
-
 
 def setup():
     '''sets up a simple dataset for tests'''

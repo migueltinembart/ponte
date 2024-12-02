@@ -4,11 +4,6 @@ from redis import Redis
 from typing import  Any
 import json
 
-class Book(BaseModel):
-    name: str
-    pages: int
-    author: str
-
 def fromStr[T: BaseModel](response: Any, model: T) -> Union[T, None]:
     if response is None:
         return None

@@ -159,5 +159,4 @@ class PullRequestEvent(BaseModel):
     number: int
     pull_request: PullRequest
     repository: Repository
-    organization: Optional[Organization]
     sender: User
