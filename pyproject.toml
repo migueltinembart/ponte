@@ -1,0 +1,30 @@
+[project]
+name = "ponte"
+dynamic = ["version"]
+dependencies = [
+  "pydantic",
+  "fastapi"
+]
+requires-python = ">=3.12"
+authors = [
+  {name = "Miguel Tinembart", email = "miguel.tinembart@gmail.com"},
+]
+maintainers = [
+  {name = "Miguel Tinembart", email = "miguel.tinembart@gmail.com"}
+]
+description = "Define your virtual machines and automate your development deployments"
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["deployment", "IaC", "infrastructure", "bridge"]
+
+[project.urls]
+# Homepage = "https://example.com"
+# Documentation = "https://example.org"
+# Repository = "https://github.com/migueltinembart/ponte.git"
+# "Bug Tracker" = "https://github.com/migueltinembart/ponte/issues"
+# Changelog = "https://github.com/migueltinembart/ponte/blob/main/CHANGELOG.md"
+#
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
