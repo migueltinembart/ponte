@@ -1,20 +1,19 @@
 from abc import abstractmethod, ABC
+from pydantic import BaseModel
+from typing import Optional
 
-from deployments import Deployment
+class Diff[T](BaseModel):
+    expr: bool
+    local: T = None
+    remote: Optional[T] = None
 
-class Service(ABC):
+class Service[T](ABC):
+    
     @abstractmethod 
-    def check_state(self):
+    def check_state(self) -> Diff[T]:
         pass
 
-    @abstractmethod 
-    def diff(self):
-        pass
-
-    @abstractmethod 
-    def decide(self):
-        pass
-
+    @abstractmethod
     def commit(self):
         pass
 
