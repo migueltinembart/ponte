@@ -143,3 +143,10 @@ class RedisRepository[T: BaseModel]:
                 return True
 
         return False
+
+def redisRepositoryFactory[T: BaseModel](key: str) -> RedisRepository:
+
+    return RedisRepository[T](
+        rc=Redis(),
+        key=key
+    )
