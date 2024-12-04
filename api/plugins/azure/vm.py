@@ -44,13 +44,14 @@ class AzureVMConfig(BaseModel):
     availability_zones: Union[int, List[int]]
     cpu_config: AzureCPUConfig
     os_config: AzureOSConfig
-    network_config: List[Union[AzurePrivateIPConfig, AzurePublicIPConfig]]
+    network_config: List[AzurePrivateIPConfig]
     customization: AzureCustomizationConfig
     storage_config: List[AzureStorageConfig]
     addons: Optional[AzureVMAddons]
 
 class AzureVM(BaseModel):
     type: Literal["azure"]
+    name: str
     config: AzureVMConfig
 
 

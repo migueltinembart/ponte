@@ -2,12 +2,13 @@ import logging
 import re
 from typing import List
 
-from azure.mgmt.compute.v2024_07_01 import _compute_management_client
-from azure.mgmt.compute.v2024_07_01.models import VirtualMachine
+from azure.mgmt.compute import ComputeManagementClient
+from azure.mgmt.compute.models import VirtualMachine
 from pydantic import ValidationError
+from testcontainers.core.waiting_utils import config
 from .service import AzureRMresourceDefinition
 
-from api.plugins.azure.vm import AzureCPUConfig, AzureCustomizationConfig, AzureEnvironment, AzureOSConfig, AzurePrivateIPConfig,AzureStorageConfig, AzureVMAccessConfig, AzureVMConfig, AzureVMInboundPortConfig 
+from api.plugins.azure.vm import AzureCPUConfig, AzureCustomizationConfig, AzureEnvironment, AzureOSConfig, AzurePrivateIPConfig,AzureStorageConfig, AzureVM, AzureVMAccessConfig, AzureVMConfig, AzureVMInboundPortConfig 
 
 def getAzureCPUConfig(vm: VirtualMachine)-> AzureCPUConfig:
     if (hardware_profile := vm.hardware_profile) and (vm_size := hardware_profile.vm_size):
@@ -104,17 +105,17 @@ def getAzureVMAccessConfig(vm: VirtualMachine) -> AzureVMAccessConfig:
         raise ValueError("No vm access configuration found for virtual machine")
     return AzureVMAccessConfig(username=vm_access_config["admin_username"], public_key_values=vm_access_config["public_key_values"])
 
-def getAzureVMConfig(client: _compute_management_client.ComputeManagementClient, resourceDefinition: AzureRMresourceDefinition) -> AzureVMConfig | None:
+def getAzureVMConfig(client: ComputeManagementClient, name: str, env: AzureEnvironment) -> AzureVMConfig | None:
     
     try:
-        vm = client.virtual_machines.get(resourceDefinition.resourceGroupName, resourceDefinition.name)
-        client_access_config = getAzureVMAccessConfig(vm)
-        cpu_config = getAzureCPUConfig(vm)
-        os_config = getAzureVMOSConfig(vm)
-        storage_configs = getAzureVMStorageConfig(vm)
-        network_config = getAzureVMNetworkConfig(vm)
+        vm_config = client.virtual_machines.get(env.resource_group, name)
+        client_access_config = getAzureVMAccessConfig(vm_config) # type: ignore
+        cpu_config = getAzureCPUConfig(vm_config)# type: ignore
+        os_config = getAzureVMOSConfig(vm_config)# type: ignore
+        storage_configs = getAzureVMStorageConfig(vm_config)# type: ignore
+        network_config = getAzureVMNetworkConfig(vm_config)# type: ignore
         customization_config = AzureCustomizationConfig(access=client_access_config , userdata="")
-        return AzureVMConfig(environment=AzureEnvironment(subscription="", resource_group=""), cpu_config=cpu_config, os_config=os_config, storage_config=storage_configs, network_config=network_config, customization=customization_config, addons=None, availability_zones=1)
+        return AzureVMConfig(environment=env, cpu_config=cpu_config, os_config=os_config, storage_config=storage_configs, network_config=network_config, customization=customization_config, addons=None, availability_zones=1)
     except ValidationError as validation_error:
         logging.info(validation_error)
     except ValueError as value_error:
@@ -122,3 +123,20 @@ def getAzureVMConfig(client: _compute_management_client.ComputeManagementClient,
     
     return None
 
+def getAzureVM(client: ComputeManagementClient, name: str, env: AzureEnvironment) -> AzureVM | None:
+    try:
+        vm_config = getAzureVMConfig(client=client, name=name, env=env)
+        if vm_config is not None:
+            return AzureVM(type="azure", name=name, config=vm_config)
+        else: 
+            return None
+    except:
+        pass
+
+    return None
+
+def createAzureVM(client: ComputeManagementClient, vm: AzureVM):
+    pass
+
+def deleteAzureVM(client: ComputeManagementClient, vm: AzureVM):
+    pass
