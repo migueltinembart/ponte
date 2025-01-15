@@ -1,5 +1,5 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 class User(BaseModel):
     login: str
@@ -50,46 +50,6 @@ class Milestone(BaseModel):
     closed_at: Optional[str]
     due_on: Optional[str]
 
-
-class PullRequest(BaseModel):
-    url: str
-    id: int
-    node_id: str
-    html_url: str
-    diff_url: str
-    patch_url: str
-    issue_url: str
-    number: int
-    state: str
-    locked: bool
-    title: str
-    user: User
-    body: Optional[str]
-    created_at: str
-    updated_at: str
-    closed_at: Optional[str]
-    merged_at: Optional[str]
-    merge_commit_sha: Optional[str]
-    assignee: Optional[User]
-    assignees: List[User]
-    requested_reviewers: List[User]
-    requested_teams: List[dict]  # The structure of teams can be modeled in detail if needed
-    labels: List[Label]
-    milestone: Optional[Milestone]
-    draft: bool
-    commits_url: str
-    review_comments_url: str
-    review_comment_url: str
-    comments_url: str
-    statuses_url: str
-    head: dict  # This can be modeled in detail based on the structure of the "head" object
-    base: dict  # This can be modeled in detail based on the structure of the "base" object
-    _links: dict  # Same here, it depends on how detailed you'd like to be
-    author_association: str
-    auto_merge: Optional[str]  # Or this could be a more detailed model if the structure is known
-    active_lock_reason: Optional[str]
-
-
 class Repository(BaseModel):
     id: int
     node_id: str
@@ -137,6 +97,53 @@ class Repository(BaseModel):
     labels_url: str
     releases_url: str
     deployments_url: str
+
+
+class Head(BaseModel):
+    label: str
+    ref: str
+    sha: str
+    user: User
+    repo: Repository
+
+
+class PullRequest(BaseModel):
+    url: str
+    id: int
+    node_id: str
+    html_url: str
+    diff_url: str
+    patch_url: str
+    issue_url: str
+    number: int
+    state: str
+    locked: bool
+    title: str
+    user: User
+    body: Optional[str]
+    created_at: str
+    updated_at: str
+    closed_at: Optional[str]
+    merged_at: Optional[str]
+    merge_commit_sha: Optional[str]
+    assignee: Optional[User]
+    assignees: List[User]
+    requested_reviewers: List[User]
+    requested_teams: List[dict]  # The structure of teams can be modeled in detail if needed
+    labels: List[Label]
+    milestone: Optional[Milestone]
+    draft: bool
+    commits_url: str
+    review_comments_url: str
+    review_comment_url: str
+    comments_url: str
+    statuses_url: str
+    head: Head  
+    base: dict  # This can be modeled in detail based on the structure of the "base" object
+    _links: dict  # Same here, it depends on how detailed you'd like to be
+    author_association: str
+    auto_merge: Optional[str]  # Or this could be a more detailed model if the structure is known
+    active_lock_reason: Optional[str]
 
 
 class Organization(BaseModel):
