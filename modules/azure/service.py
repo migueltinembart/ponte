@@ -1,7 +1,5 @@
-from typing import Any, Optional
 from pydantic import BaseModel
 from azure.identity import ClientSecretCredential
-from api.deployments import Deployment
 from api.plugins.azure.vm import AzureVM
 from api.service import Service, Diff
 from config import ServerConfig
@@ -53,4 +51,3 @@ class VMService(Service[AzureVM]):
                     logging.info(e)
         else:
             return None
-

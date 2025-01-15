@@ -5,10 +5,8 @@ from typing import List
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.compute.models import VirtualMachine
 from pydantic import ValidationError
-from testcontainers.core.waiting_utils import config
-from .service import AzureRMresourceDefinition
 
-from api.plugins.azure.vm import AzureCPUConfig, AzureCustomizationConfig, AzureEnvironment, AzureOSConfig, AzurePrivateIPConfig,AzureStorageConfig, AzureVM, AzureVMAccessConfig, AzureVMConfig, AzureVMInboundPortConfig 
+from api.plugins.azure.vm import AzureCPUConfig, AzureCustomizationConfig, AzureEnvironment, AzureOSConfig, AzurePrivateIPConfig,AzureStorageConfig, AzureVM, AzureVMAccessConfig, AzureVMConfig
 
 def getAzureCPUConfig(vm: VirtualMachine)-> AzureCPUConfig:
     if (hardware_profile := vm.hardware_profile) and (vm_size := hardware_profile.vm_size):

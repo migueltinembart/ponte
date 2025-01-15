@@ -1,12 +1,11 @@
-from typing import Literal, Union
+from typing import Literal, Union, Any
 from uuid import UUID, uuid4
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
-from plugins.demo import DemoVM
-from plugins.azure.vm import AzureVM
+from modules.azure.vm import AzureVM
 
-VM = Union[AzureVM, DemoVM]
+VM = Union[AzureVM, Any]
 
 class Deployment(BaseModel):
     id: UUID = Field(default_factory=uuid4)
