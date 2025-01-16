@@ -28,6 +28,22 @@ Ich hatte früher viel Spass beim austesten von verschiedenen Programmierkonzept
 
 ## Aufbau
 
-// TODO
+Folgende Aspekte werden in dieser Arbeit ausführlicher behandelt:
+
+- Aufbau des Codes
+    - Konzepte
+    - Snippets
+    - OOP und Funktionale Programmierung
+- Komponenten
+    - Abhängigkeiten
+    - Entwicklungsworkflow
+    - Paketierung und Containerisierung
+- Umsetzung und Planung
+    - Probleme
+    - Lösungen
+    - Tests
+- Reflexion und Fazit
+
+Die Quellenbeschriebe werden in Form von Markdownlinks so gut wie möglich referenziert und möglichst realitätsgetreu abgebildet.
 
 
