@@ -10,7 +10,7 @@ import pytest
 import logging
 from testcontainers import redis
 from testcontainers.core.container import wait_for_logs
-from store.redis import RedisRepository
+from modules.redis import RedisRepository
 
 # Test class
 class Book(BaseModel):
