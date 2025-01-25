@@ -1,10 +1,10 @@
----
+--
 title: Snippets
 date: 2024-01-19
 tags: 
-    - code 
-    - python
-    - generics
+- code 
+- python
+- generics
 ---
 
 # Snippets
@@ -113,3 +113,49 @@ def redisRepositoryFactory[T: BaseModel](key: str) -> RedisRepository:
         key=key
     )
 ```
+
+Dies erlaubt mir den Typ `T` durch einen beliebigen Typ zu ersetzen und meine Typendeklarationen erwarten immer den entsprechenden Typ von Redis. Redis behält durch den key den Überblick und weiss wo die entsprechenden Daten abgelegt sind.
+
+## externen Output validieren
+
+Beim holen oder erstellen von VMs mit der Azure SDK für Python möchte ich dass die von mir festgelegten Felder einer Azure VM Definition entsprechen und muss dementsprechend den Input durch pydantic validieren lassen indem ich mit der walrus notation alle Werte auf ihre Präsenz überprüfe, da man bei einem API Aufruf auch davon ausgehen könnte das bestimmte Felder undefiniert sind.
+
+```python
+class AzureStorageConfig(BaseModel):
+    type: Literal["primary", "data"]
+    size: int
+    disk_type: Literal["Standard_LRS", "Premium_LRS", "StandardSSD_LRS", "UltraSSD_LRS", "Premium_ZRS", "StandardSSD_ZRS", "PremiumV2_LRS"]
+```
+
+Dies entspricht dem Model welches in yaml in der `ponte` configuration eingetragen ist. Bevor die VM erstellt wird, muss diese gegenüber Azure geprüft werden ob sich nichts am File verändert hat. So muss ponte keine Veränderungen vornehmen. Sobald aber die Konfiguration beim Storage angepasst werden müsste, müsste die VM zerstört und entsprechend der neuen Konfiguration erstellt werden.
+
+```python
+def getAzureVMStorageConfig(vm: VirtualMachine) -> List[AzureStorageConfig]:
+    disks: List[AzureStorageConfig] = []
+    secondary_disks: List[AzureStorageConfig] = []
+    
+    if (storage_profile := vm.storage_profile):
+        if (os_disk := storage_profile.os_disk) and (disk_size_gb := os_disk.disk_size_gb) and ( managed_disk := os_disk.managed_disk ) and (storage_account_type := managed_disk.storage_account_type):
+            if storage_account_type is str:
+                primary_disk = AzureStorageConfig(
+                    type="primary", 
+                    size=disk_size_gb,
+                    disk_type=storage_account_type
+                )
+                disks.append(primary_disk)
+        else:
+            raise ValidationError("No os Disk found for virtual machine")
+
+        if (data_disks := storage_profile.data_disks):
+            for disk in data_disks:
+                if (disk_size_gb := disk.disk_size_gb) and (managed_disk := disk.managed_disk) and (storage_account_type := managed_disk.storage_account_type):
+                    secondary_disks.append(AzureStorageConfig(type="data", size=disk_size_gb, disk_type=storage_account_type)) # type: ignore
+    
+        disks.extend(secondary_disks)
+    else:
+        raise ValueError("Storage profile could not be read from virtual machine")
+
+    return disks
+```
+
+Die Verkettung von And Operationen ermöglichst es mir eine Operation als ganzes anzusehen. alle Felder die nicht optional sind werden nicht geprüft und am Ende validiert das `AzureStorageConfig`. Beim aufrufen der Funktion werden die möglichen Validationsfehler gecatcht und markieren das Deployment als Fehlschlag.
