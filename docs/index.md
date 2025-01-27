@@ -46,4 +46,30 @@ Folgende Aspekte werden in dieser Arbeit ausführlicher behandelt:
 
 Die Quellenbeschriebe werden in Form von Markdownlinks so gut wie möglich referenziert und möglichst realitätsgetreu abgebildet.
 
+### Beschreibung zum Aufbau
+
+Um die Aspekte rund um den Code-Aufbau mitsamt konzeptioneller Gedanken und Entscheidungen genauer beschireben zu haben, sind folgende Gliederungen definiert um die grösseren Komponenten der Semesterarbeit einzufangen. 
+
+**Codeaufbaue** ist eine Sammlung von Themen rund um code spezifische Ausdrücke in Ponte. Die Seiten sind eher technisch aufgebaut und beinhalten Design Patterns oder Design Implementationen beschreibt diese ausführlicher.
+
+**Komponenten** legt alle Teile von Ponte zusammen um die Lifecycle-Entscheide und das grundsätzliche Design besser zu beschreiben und diese auszulegen. Themen wie das Vorgehen bei Updates in Libraries wird zum Beispiel dort angeschnitten.
+**Umsetzung** behandelt die Ausführung und Planung von Ponte und wo es Probleme gab oder wo diese gelöst wurden. Die nötigen Tools und wie sie bei der Ausgührung beigetragen haben haben dort ihren Platz.
+
+#### Codeaufbau
+
+- [Konzepte](/codeaufbau/konzepte.md): Beschreibt Abstraktionen und die Nutzung verschiedener Techniken und vergleicht diese mit anderen Programmierparadigmen.
+- [OOP und Funktionale Programmierung](/codeaufbau/oop-und-funktionale-programmierung.md): Ist eine Sammlung von Gedanken rund um 
+- [Snippets](/codeaufbau/snippets.md): Sind eine Sammlung von nützlichen eher generische Lösungen und Beispiele
+
+#### Komponenten
+
+- [Abhängigkeiten](/komponenten/abhaengigkeiten.md): Beschreibt die Abhängigkeiten und sammelt diese in Unterkapitel. Wie muss vorgegangen werden wenn z.B. eine neue Breaking change in einer Library auftaucht.
+- [Entwicklungsworkflow](/komponenten/entwicklungsworkflow.md): Zeigt Entwicklungskomponenten und wie diese für die mögliche Kollaboration mit mehreren Entwicklern genutzt werden kann.
+- [Paketierung und Containerierisierung](/komponenten/paketierung-und-containerisierung.md): Zeigt auf was geachtet werden muss wenn die Software als Container Image zur Verfügung stellen muss. Wie werden Vulnerabilities assessed.
+
+#### Umstzung
+
+- [Nutzung](/umsetzung/nutzung.md): Zeigt wie man Ponte mit Docker verwendet und die Variabeln nötig um ponte richtig einzusetzen
+- [Testing](/umsetzung/testing.md): Erklärt wie bei Tests vorgegangen wurde um die Funktion von eigenen Abstraktionen als Unit Tests zu testen
+- [Tools](/umsetzung/Tools): Zeigt wie mit den verschieden Tools umgeganen wurde und listet die genutzten Resourcen die für die Umsetzung des Projekts nötig waren.
 
