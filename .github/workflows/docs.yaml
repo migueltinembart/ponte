@@ -1,0 +1,132 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_artifact:
+    runs-on: ubuntu-latest
+    name: Create Artifact
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: content
+
+      - name: archive and include dotfile
+        run: |
+          tar -czvf content.tar.gz content
+        working-directory: ${{ github.workspace }}
+
+      - name: Archive production build
+        uses: actions/upload-artifact@v2
+        with:
+          name: content
+          path: ${{ github.workspace}}/content.tar.gz
+
+  clone_repo:
+    needs: create_artifact
+    runs-on: ubuntu-latest
+    name: Clone Repo
+    steps:
+      - name: clone_quartz
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          repository: "quartz"
+          branch: "v4"
+          owner: "jackyzha0"
+          depth: 1
+
+      - name: remove docs folder
+        run: |
+          rm -rf quartz/docs
+        working-directory: ${{ github.workspace }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: content
+          path: ${{ github.workspace }}
+
+      - name: untar content.tar.gz
+        run: |
+          tar -xzvf content.tar.gz -C quartz
+        working-directory: ${{ github.workspace }}
+
+
+      - name: move quartz.config.ts
+        run: |
+          mv quartz.config.ts ../..
+        working-directory: ${{ github.workspace }}/quartz/content/deps
+
+      - name: tar quartz
+        run: |
+          tar -czvf quartz.tar.gz quartz
+        working-directory: ${{ github.workspace }}
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app
+          path: ${{ github.workspace }}/quartz.tar.gz
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    needs: clone_repo
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: app
+
+      - name: Unpack artifact
+        run: |
+          tar -xzvf quartz.tar.gz
+        working-directory: ${{ github.workspace }}
+
+      - name: Use NodeJs
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.14
+
+      - name: Install dependencies
+        run: |
+          npm install
+        working-directory: ${{ github.workspace }}/quartz
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: app
+          path: ${{ github.workspace }}
+
+      - name: Unpack artifact
+        run: |
+          tar -xzvf quartz.tar.gz
+        working-directory: ${{ github.workspace }}
+
+      - name: npm install
+        run: |
+          npm install
+        working-directory: ${{ github.workspace }}/quartz
+
+      - name: build
+        run: |
+          npx quartz build
+        working-directory: ${{ github.workspace }}/quartz
+
+      - name: Deploy to cloudflare pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+          directory: ${{ github.workspace }}/quartz/public

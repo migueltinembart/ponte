@@ -41,3 +41,6 @@ docker run --rm \
   ghcr-io/migueltinembart/ponte
 ```
 
+## Maintenance
+
+Logs werden wie üblich direkt in die Konsole geloggt. Es wurde so viel wie möglich mit Loguri gearbeitet um auch während der Laufphase des Applikation einzusehen. Der Loglevel kann konventionell über die Umgebungsvariable `LOG_LEVEL` angepasst werden. Momentan sind nicht alle Log Levels vollkommen eingefangen und Debug bietet momentan minimale Messages. Dies könnte in der Nachzeit angepasst werden.
