@@ -55,6 +55,10 @@ jobs:
           tar -xzvf content.tar.gz -C quartz
         working-directory: ${{ github.workspace }}
 
+      - name: list dir
+        run: |
+          ls -la ./quartz/*/*
+        working-directory: ${{ github.workspace }}
 
       - name: move quartz.config.ts
         run: |
