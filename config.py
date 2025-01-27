@@ -1,27 +1,32 @@
-from typing import Optional
+from typing import Dict, Optional, Any
 from pydantic import Field, RedisDsn, ValidationError
 from pydantic_settings import BaseSettings
+from azure.identity import DefaultAzureCredential
+from redis import Redis
+
+class NoCredentialsError(Exception):
+    pass
 
 class ServerConfig(BaseSettings):
     base_url: Optional[str] = Field(validation_alias='ponte_base_url', default="localhost")
     server_port: str = Field(validation_alias='ponte_port', default="8080")
     redis_dsn: Optional[RedisDsn] = Field(validation_alias='redis_connection_string', default=None)
-    gh_app_id: str = Field(validation_alias='github_app_id')
-    gh_webhook_secret: str =  Field(validation_alias='github_webhook_secret')
-    gh_private_key: str = Field(validation_alias="github_private_key")
+    gh_app_id: str = Field(validation_alias='gh_app_id')
+    gh_webhook_secret: str =  Field(validation_alias='gh_webhook_secret')
+    gh_client_secret: str = Field(validation_alias="github_client_secret")
 
-    azure_subscription_id: Optional[str] = Field(validation_alias="azure_subscription_id")
-    azure_tenant_id: Optional[str] = Field(validation_alias="azure_tenant_id")
-    azure_client_id: Optional[str] = Field(validation_alias="azure_client_id")
-    azure_client_secret: Optional[str] = Field(validation_alias="azure_client_secret")
-
-def loadEnv():
+def generate_Credentials() -> Dict[str, Any]:
     try:
-        ServerConfig().model_dump()
-    except ValidationError as e:
+        credential = DefaultAzureCredential()
+        config = ServerConfig().model_dump()
+        redisClient = Redis.from_url(config['redis_dsn'])
+        return {
+            'azure': credential,
+            'redis': redisClient
+        }
+ 
+    except Exception as e:
         print("Missing required environment variables")
         print(e)
-        exit(1)
-
-if __name__ == "__main__":
-    loadEnv()
+        raise NoCredentialsError()
+    

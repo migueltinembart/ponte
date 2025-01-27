@@ -1,14 +1,20 @@
 from loguru import logger
-from config import loadEnv
+import redis
+from config import NoCredentialsError, generate_Credentials
 from fastapi import FastAPI
 from api import events
 
 logger.info("Loading Routes")
-# loadEnv()
 
-logger.info("Creating Job Queue")
+try:
+    credentials = generate_Credentials()
+except NoCredentialsError as e:
+    logger.error("Missing required environment variables, shutting down ponte", e)
+    exit(1)
 
-events.initialize_threads()
+
+
+events.initialize_threads(azure_credentials=credentials["azure"], redis=credentials['redis'])
 
 app = FastAPI()
 
