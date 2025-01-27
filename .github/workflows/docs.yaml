@@ -94,7 +94,7 @@ jobs:
       - name: Use NodeJs
         uses: actions/setup-node@v2
         with:
-          node-version: 18.14
+          node-version: 22
 
       - name: Install dependencies
         run: |
