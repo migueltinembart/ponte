@@ -28,33 +28,29 @@ You can also run `ponte` as a docker container if you want
 
 ```
 docker run --rm \
-  ghcr.io/migueltinembart/ponte \
-  --gh-app-id <app-id> \
-  --client-id <client-id> \
-  --tenant-id <tenant-id> \
-  --client-secret <client-secret>
-```
-
-Alternatively, you can provide the same configuration through environment variables:
-
-```
-docker run --rm \
   -e GH_APP_ID=<app-id> \
-  -e CLIENT_ID=<client-id> \
-  -e TENANT_ID=<tenant-id> \
-  -e CLIENT_SECRET=<client-secret> \
+  -e AZURE_CLIENT_ID=<client-id> \
+  -e AZURE_TENANT_ID=<tenant-id> \
+  -e AZURE_CLIENT_SECRET=<client-secret> \
   my-registry/ponte:latest
 ```
 
 ## Configuration
 
-Ponte accepts the following parameters either as CLI arguments or environment variables. If both are provided, CLI arguments take precedence.
+Ponte accepts the following parameters either as environment variables. If both are provided, CLI arguments take precedence.
 
-Environment Variable	CLI Flag	Description
-GH_APP_ID	--gh-app-id	The GitHub App ID used for authentication and event processing.
-CLIENT_ID	--client-id	The client_id (application_id) to an entra id app registrastration.
-TENANT_ID	--tenant-id	The tenant_id of your entra id tenant.
-CLIENT_SECRET	--client-secret	The client secret.
+Service principal with secret
+
+| Variable name       | Value |
+| --- | --- |
+| AZURE_CLIENT_ID     |	ID of a Microsoft Entra application |
+| AZURE_TENANT_ID     |	ID of the application's Microsoft Entra tenant | 
+| AZURE_CLIENT_SECRET |	one of the application's client secrets | 
+| REDIS_DSN | Supply the connectionstring to your redis instance |
+| GH_APP_ID           | The Application ID of your Github App |
+| GH_CLIENT_SECRET | The Client secret of you gh app |
+| GH_WEBHOOK_SECRET | (optional) supply a webhook secret |
+| BASE_URL | (optional) Supply the base url for the app |
 
 ## Contributing
 
