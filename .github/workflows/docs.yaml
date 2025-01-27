@@ -59,7 +59,12 @@ jobs:
       - name: move quartz.config.ts
         run: |
           mv quartz.config.ts ../..
-        working-directory: ${{ github.workspace }}/quartz/content/deps
+        working-directory: ${{ github.workspace }}/quartz/docs/deps
+
+      - name: rename docs to content
+        run: | 
+          mv -f docs content
+        working_directory: ${{ github.workspace }}/quartz  
 
       - name: tar quartz
         run: |
