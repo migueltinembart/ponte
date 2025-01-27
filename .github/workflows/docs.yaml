@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  WORKING_DIR=${{ github.workpspace}}/docs
+
 jobs:
   create_artifact:
     runs-on: ubuntu-latest
@@ -17,11 +20,11 @@ jobs:
 
       - name: archive and include dotfile
         run: |
-          tar -czvf content.tar.gz content
+          tar -czvf content.tar.gz content/docs
         working-directory: ${{ github.workspace }}
 
       - name: Archive production build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: content
           path: ${{ github.workspace}}/content.tar.gz
@@ -45,7 +48,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: content
           path: ${{ github.workspace }}
