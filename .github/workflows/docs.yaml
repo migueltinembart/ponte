@@ -52,23 +52,18 @@ jobs:
 
       - name: untar content.tar.gz
         run: |
-          tar -xzvf content.tar.gz -C quartz
-        working-directory: ${{ github.workspace }}
-
-      - name: list dir
-        run: |
-          ls -la ./quartz/*/*
+          tar -xzvf content.tar.gz
         working-directory: ${{ github.workspace }}
 
       - name: move quartz.config.ts
         run: |
-          mv quartz.config.ts ../..
-        working-directory: ${{ github.workspace }}/quartz/docs/deps
+          mv quartz.config.ts ../../../quartz
+        working-directory: ${{ github.workspace }}/content/docs/deps
 
       - name: rename docs to content
         run: | 
-          mv -f docs content
-        working-directory: ${{ github.workspace }}/quartz  
+          mv -f  docs/* ../quartz/content
+        working-directory: ${{ github.workspace }}/content
 
       - name: tar quartz
         run: |
