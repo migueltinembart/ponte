@@ -1,9 +1,10 @@
-import logging
 from typing import Dict, Literal, Any, Tuple
 from uuid import uuid4
+from azure.identity import DefaultAzureCredential
 from fastapi import APIRouter
 from pydantic import BaseModel
 from pydantic.types import UUID4
+from redis import Redis
 from api.jobs import Job
 from modules.github.models.webhook import PullRequestEvent
 from modules.github.request import getPonteConfig
@@ -54,12 +55,12 @@ def react_to_webhook(provider: allowed_providers, payload: PullRequestEvent | An
 
 jobQueue: queue.Queue[Tuple[str, WebHookData]] = queue.Queue()
 
-def initialize_threads() -> None:
+def initialize_threads(azure_credentials: DefaultAzureCredential, redis: Redis) -> None:
 
     def process_job(job_id: str, data: WebHookData[Event]) -> None:
         logger.info(f"Started processing job {job_id} with event '{data}'")
-        eventdata: Event = data.metadata
         get_config_from_github(event=eventdata)
+        run_deployment(azure_credentials, redis)
         logger.info(f"Finished processing job {job_id}")
 
     def worker():
