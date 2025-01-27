@@ -61,4 +61,4 @@ Um die Tests effizient nutzen zu können verwende ich Github Actions um die Test
 
 Für eine Github Actions Pipeline muss eine workflow Definition unter `.github/workflows` in deinem git-repository bestehen. Für ponte besteht eine Pipeline unter [.github/workflows/pytest.yaml](https://github.com/migueltinembart/ponte/blob/main/.github/workflows/pytest.yaml) und startet die pytest. Der Workflow startet dann ein Container image für redis anhand des tests und führt diese für verschieden Python Versionen durch.
 
-
+Man könnte weitere Mechanismen damit verbinden dass die Tests ausschlaggebend dafür wären einen Pull Request erst überhaupt zu mergen oder dass die nächste stage in einer Pipeline erst weiterführen kann. Das inkludieren von Tests macht den Prozess ersichtlich und lässt andere Entscheidungen von den Tests abhängen. Dies führt schlussendlich zu sauberen Code.
