@@ -2,7 +2,7 @@ pydantic
 pydantic_settings
 pytest
 coverage
-fastapi
+fastapi[standard]
 redis
 testcontainers
 typing-inspect
