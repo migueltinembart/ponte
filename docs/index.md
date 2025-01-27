@@ -1,3 +1,14 @@
+---
+title: Tools
+date: 2024-01-25
+tags:
+    - cli 
+    - devcontainers
+    - git 
+    - neovim 
+    - tests
+---
+
 # Ponte
 
 Ponte ist ein ein minimaler Webdienst für die Erstellung von cloud Resourcen anhand eines Konfigurtionsfile im Repository. Das Konfigurationsfile entspricht einem Schema und bietet Autocompletion für die Konfigurationssprache mitHilfe von `json schema`.
