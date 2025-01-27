@@ -64,7 +64,7 @@ jobs:
       - name: rename docs to content
         run: | 
           mv -f docs content
-        working_directory: ${{ github.workspace }}/quartz  
+        working-directory: ${{ github.workspace }}/quartz  
 
       - name: tar quartz
         run: |
