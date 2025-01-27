@@ -67,7 +67,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: app
           path: ${{ github.workspace }}/quartz.tar.gz
@@ -78,7 +78,7 @@ jobs:
     needs: clone_repo
     steps:
       - name: download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: app
 
@@ -103,7 +103,7 @@ jobs:
     name: Deploy to Cloudflare Pages
     steps:
       - name: download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: app
           path: ${{ github.workspace }}
